@@ -2,11 +2,26 @@ open Lexer
 open Lexing
 open Core.Std
 
+let parse_except lexbuf =
+  try Parser.program Lexer.token lexbuf with
+  | SyntaxError msg ->
+    fprintf stderr "%s\n" msg;
+    None
+  | Parser.Error ->
+    fprintf stderr "syntax error\n";
+    exit (-1)
+
 let rec parse_and_print lexbuf =
-  match Parser.prog Lexer.token lexbuf with
-  | Some value ->
-      printf "%a\n" Ast.dump value;
-      parse_and_print lexbuf
+  match parse_except lexbuf with
+  | Some values ->
+      let rec help = function
+        | [] -> ()
+        | (v::vs) ->
+          printf "%a\n" Ast.dump_ast v;
+          help vs;
+      in
+        help values;
+        parse_and_print lexbuf
   | None -> ()
 
 let loop filename () =
