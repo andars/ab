@@ -6,4 +6,7 @@ all: native
 native:
 	$(OCB) $(OCB_FLAGS) test.native
 
+clean:
+	$(OCB) -clean
+
 .PHONY: native all
