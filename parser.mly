@@ -21,7 +21,7 @@
 %%
 
 program:
-  | ds = definition*; EOF     { Some ds }
+  | ds = definition+; EOF     { Some ds }
   | EOF                       { None }
   ;
 
