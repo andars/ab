@@ -55,17 +55,24 @@ let rec emit_stmt outc stmt = match stmt with
   | _ -> ()
 ;;
 
-let emit_function_prologue outc =
-  emit outc "pushq %rbp";
-  emit outc "movq %rsp, %rbp";
-;;
-
 let emit_function outc (name, body) =
-  Stack.push name enclosing;
-  emit outc (".globl " ^ name);
-  emit_label outc name;
-  emit_function_prologue outc;
-  emit_stmt outc body;
+  let emit_function_prologue () =
+    emit outc "pushq %rbp";
+    emit outc "movq %rsp, %rbp";
+  in
+  let emit_function_epilogue () =
+    emit outc "movq %rbp, %rsp";
+    emit outc "popq %rbp";
+    emit outc "retq";
+  in
+    Stack.push name enclosing;
+    emit outc (".globl " ^ name);
+    emit_label outc name;
+    emit_function_prologue ();
+    emit_stmt outc body;
+    emit_label outc (name ^ "_end");
+    emit_function_epilogue ();
+    ignore (Stack.pop enclosing);
 ;;
 
 let emit_global_decl outc name =
