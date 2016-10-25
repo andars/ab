@@ -1,7 +1,7 @@
 OCB_FLAGS = -use-menhir -tag thread -use-ocamlfind
 OCB = ocamlbuild
 
-all: native
+all: compile
 
 parse:
 	$(OCB) $(OCB_FLAGS) parse.native
@@ -9,9 +9,11 @@ parse:
 
 compile:
 	$(OCB) $(OCB_FLAGS) compile.native
-	./compile.native main.b > out.s
-	as out.s -o out.o
-	ld out.s brt0.s -o a.out
+	mkdir -p build/
+	./compile.native main.b > build/out.s
+	as build/out.s -o build/out.o
+	as brt0.s -o build/brt0.o
+	ld build/out.o build/brt0.o -o a.out
 
 clean:
 	$(OCB) -clean
