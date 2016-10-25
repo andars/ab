@@ -51,6 +51,8 @@ let rec emit_stmt outc stmt = match stmt with
       emit_return outc v
   | `Binary _ | `Int _ ->
       emit_expr outc stmt
+  | `Label l ->
+      emit_label outc l (*TODO mangle to prevent collisions*)
   | `Nothing -> ()
   | _ -> ()
 ;;
