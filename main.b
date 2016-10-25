@@ -7,5 +7,5 @@ main () {
     foo:
     47 + 54;
     ;;;;;;
-    return n + 2 * 3;
+    return (n + 2 * 3);
 }

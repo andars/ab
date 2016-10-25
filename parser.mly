@@ -41,7 +41,7 @@ statement:
   | AUTO; id = IDENT; SEMICOLON;            {`Local id }
   | EXTRN; id = IDENT; SEMICOLON;           {`External id }
   | l = IDENT; COLON;                       {`Label l }
-  | RETURN; v = rvalue? SEMICOLON           {`Return v }
+  | RETURN; v = return_value ; SEMICOLON    {`Return v }
   | LBRACE; stmts = statement*; RBRACE      {`Compound stmts }
   | v = rvalue? SEMICOLON
     { match v with
@@ -49,6 +49,12 @@ statement:
         | None -> `Nothing
     }
   ;
+
+return_value:
+  |                                     { None }
+  | LPAREN; v = rvalue; RPAREN          { Some v }
+
+
 
 rvalue:
   | LPAREN; v = rvalue; RPAREN          { v }
