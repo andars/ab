@@ -76,11 +76,9 @@ let emit_global_decl outc name =
 ;;
 
 
-(*let emit_expr outc = ()*)
-
-
 let codegen outc = function
   | `Function f -> emit_function outc f
   | `Global name -> emit_global_decl outc name
   | _ -> ()
+;;
 
