@@ -1,4 +1,4 @@
-.globl _start:
+.globl _start
 _start:
     xor %rbp, %rbp
 
