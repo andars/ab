@@ -41,6 +41,7 @@ let rec emit_expr outc expr =
       | "local" -> ()
       | "external" ->
           emitf outc "movq %s(%%rip), %%rax\n" name;
+      | _ -> emit outc "UNKNOWN VAR TYPE";
   in
   match expr with
   | `Int i ->
