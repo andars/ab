@@ -1,4 +1,6 @@
 let enclosing = Stack.create();;
+let syms = ((Hashtbl.create 16) : (string, (string*int)) Hashtbl.t);;
+
 
 let emit outc (str:string) =
   output_string outc (str ^ "\n");
@@ -25,15 +27,26 @@ let binary_insn_for = function
 
 let rec emit_expr outc expr =
   let emit_binary (op, lhs, rhs) =
+    emit outc "pushq %rbx";
     emit_expr outc lhs;
     emit outc "movq %rax, %rbx";
     emit_expr outc rhs;
-    emitf outc "%s %%rbx, %%rax\n" (binary_insn_for op)
+    emitf outc "%s %%rbx, %%rax\n" (binary_insn_for op);
+    emit outc "popq %rbx"
+  in
+  let emit_varref name =
+    let (vartype, index) = Hashtbl.find syms name
+    in
+    match vartype with
+      | "local" -> ()
+      | "external" ->
+          emitf outc "movq %s(%%rip), %%rax\n" name;
   in
   match expr with
   | `Int i ->
-      emitf outc "movq $%d, %%rax\n" i
-  | `Binary b -> emit_binary b
+      emitf outc "movq $%d, %%rax\n" i;
+  | `Binary b -> emit_binary b;
+  | `Var name -> emit_varref name;
   | _ -> ()
 ;;
 
@@ -53,6 +66,12 @@ let rec emit_stmt outc stmt = match stmt with
       emit_expr outc stmt
   | `Label l ->
       emit_label outc l (*TODO mangle to prevent collisions*)
+  | `Local name ->
+      let len = Hashtbl.length syms
+      in
+        Hashtbl.add syms name ("local", len + 1)
+  | `External name ->
+      Hashtbl.add syms name ("external", 0)
   | `Nothing -> ()
   | _ -> ()
 ;;

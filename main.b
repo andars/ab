@@ -3,8 +3,9 @@ n;
 main () {
     auto x;
     extrn y;
+    extrn n;
     foo:
     47 + 54;
     ;;;;;;
-    return 2 + 2 * 3 + 74;
+    return n + 2 * 3;
 }
